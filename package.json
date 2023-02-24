@@ -1,0 +1,29 @@
+{
+  "name": "notes-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/bencoderus/serverless-notes-api.git",
+  "author": "Benjamin Iduwe <bencoderus@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon --exec serverless offline start",
+    "serve": "serverless offline start --reloadHandler",
+    "start": "serverless offline start",
+    "deploy": "serverless deploy"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.2",
+    "babel-plugin-source-map-support": "^2.2.0",
+    "nodemon": "^2.0.20",
+    "serverless-offline": "^12.0.4",
+    "serverless-offline-watcher": "^1.0.2",
+    "serverless-webpack": "^5.11.0",
+    "webpack": "^5.75.0",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "source-map-support": "^0.5.21"
+  }
+}

@@ -6,9 +6,9 @@
  * @param {unknown} data
  * @returns {Record<string, any>}
  */
-module.exports.respond = (statusCode, message, data = null) => {
+export function respond(statusCode, message, data = null) {
   const status = statusCode >= 200 && statusCode <= 210;
-  const headers = { ContentType: "application/json" };
+  const headers = { "Content-Type": "application/json" };
 
   const responseData = {
     status,
@@ -20,11 +20,9 @@ module.exports.respond = (statusCode, message, data = null) => {
     responseData[additional] = data;
   }
 
-  const responseBody = JSON.stringify(responseData);
-
   return {
     statusCode,
     headers,
-    body: responseBody,
+    body: JSON.stringify(responseData, null, 2),
   };
-};
+}

@@ -1,17 +1,80 @@
 service: notes-api
-frameworkVersion: '3'
+frameworkVersion: "3"
+configValidationMode: error
 
 provider:
   name: aws
   runtime: nodejs18.x
+  region: us-east-1
+  tags:
+    serviceName: notes-api
+  stage: dev
+  httpApi:
+    cors: true
+  # environment:
+    # USER_POOL_ID: { Ref: UserPool }
+    # USER_POOL_CLIENT_ID: { Ref: UserClient }
+
+custom:
+  userPoolName: "${self:provider.stage}-notes-api"
+  userPoolClientName: "${self:custom.userPoolName}-client"
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true # enable auto-packing of external modules
+
+# resources:
+#   # Resources:
+#   #   # UserPool:
+#   #   #   Type: AWS::Cognito::UserPool
+#   #   #   Properties:
+#   #   #     UserPoolName: ${self:custom.userPoolName}
+#   #   #     UsernameAttributes:
+#   #   #       - email
+#   #   #     Policies:
+#   #   #       PasswordPolicy:
+#   #   #         MinimumLength: 8
+#   #   #         RequireLowercase: True
+#   #   #         RequireNumbers: True
+#   #   #         RequireSymbols: True
+#   #   #         RequireUppercase: True
+#   #   #     Schema:
+#   #   #       - Name: email
+#   #   #         Required: true
+#   #   #         Mutable: true
+#   #   #     AutoVerifiedAttributes: ["email"]
+
+#   #   # UserClient:
+#   #   #   Type: AWS::Cognito::UserPoolClient
+#   #   #   Properties:
+#   #   #     ClientName: ${self:custom.userPoolClientName}
+#   #   #     GenerateSecret: false
+#   #   #     UserPoolId: { Ref: UserPool }
+#   #   #     AccessTokenValidity: 5
+#   #   #     IdTokenValidity: 5
+#   #   #     ExplicitAuthFlows:
+#   #   #       - "ADMIN_NO_SRP_AUTH"
 
 functions:
-  api:
-    handler: src/common/handler.index
+  get-notes:
+    handler: src/notes/functions/get-notes.handler
+    memorySize: 1024
     events:
       - httpApi:
-          path: /
+          path: /notes
+          method: get
+  create-note:
+    handler: src/notes/functions/create-note.handler
+    events:
+      - httpApi:
+          path: /notes
+          method: post
+  get-note:
+    handler: src/notes/functions/get-note.handler
+    events:
+      - httpApi:
+          path: /notes/{id}
           method: get
 
 plugins:
+  - serverless-webpack 
   - serverless-offline
