@@ -24,6 +24,11 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "source-map-support": "^0.5.21"
+    "@supabase/supabase-js": "^2.10.0",
+    "aws-sdk": "^2.1323.0",
+    "jsonwebtoken": "^9.0.0",
+    "source-map-support": "^0.5.21",
+    "ulid": "^2.3.0",
+    "yup": "^1.0.2"
   }
 }

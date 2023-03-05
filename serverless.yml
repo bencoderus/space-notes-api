@@ -11,70 +11,155 @@ provider:
   stage: dev
   httpApi:
     cors: true
-  # environment:
-    # USER_POOL_ID: { Ref: UserPool }
-    # USER_POOL_CLIENT_ID: { Ref: UserClient }
+    authorizers:
+      verify-token:
+        type: request
+        functionName: verify-token
+        resultTtlInSeconds: 300
+        identitySource:
+          - $request.header.Authorization # this is ignored by serverless-offline but will default to the Authorization header anyway
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [NotesDynamoDBTable, Arn]
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+          Resource:
+            - Fn::GetAtt: [NotesDynamoDBTable, Arn]
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.noteTableName}/index/*
+  environment:
+    NOTES_TABLE_NAME: "${self:custom.noteTableName}"
+    SUPABASE_URL: "https://kjosizddxhvvsajpuoxl.supabase.co"
+    SUPABASE_JWT_SECRET: "mFdY5YQ8w4r4gbZXA6kvOTkdC8fOs3Arub1L6B1NmiOfWA7tFdrpKUHrS2infIVeO2oZnbhR0hjGko0OrsRPqw=="
+    SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtqb3NpemRkeGh2dnNhanB1b3hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Nzc5MjYyNjMsImV4cCI6MTk5MzUwMjI2M30.BdNXRfv7aRa5oazBXRf48PAlvaFE7uM_NWsRAz-ejTc"
 
 custom:
   userPoolName: "${self:provider.stage}-notes-api"
+  noteTableName: "${self:service}-notes-table"
   userPoolClientName: "${self:custom.userPoolName}-client"
+  readCapacity: 3
+  writeCapacity: 3
   webpack:
     webpackConfig: ./webpack.config.js
-    includeModules: true # enable auto-packing of external modules
+    includeModules: true
 
-# resources:
-#   # Resources:
-#   #   # UserPool:
-#   #   #   Type: AWS::Cognito::UserPool
-#   #   #   Properties:
-#   #   #     UserPoolName: ${self:custom.userPoolName}
-#   #   #     UsernameAttributes:
-#   #   #       - email
-#   #   #     Policies:
-#   #   #       PasswordPolicy:
-#   #   #         MinimumLength: 8
-#   #   #         RequireLowercase: True
-#   #   #         RequireNumbers: True
-#   #   #         RequireSymbols: True
-#   #   #         RequireUppercase: True
-#   #   #     Schema:
-#   #   #       - Name: email
-#   #   #         Required: true
-#   #   #         Mutable: true
-#   #   #     AutoVerifiedAttributes: ["email"]
+resources:
+  Resources:
+    NotesDynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: noteId
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: noteId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: noteStatus
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: userId
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 3
+              WriteCapacityUnits: 3
+        ProvisionedThroughput:
+          ReadCapacityUnits: 3
+          WriteCapacityUnits: 3
+        TableName: ${self:custom.noteTableName}
 
-#   #   # UserClient:
-#   #   #   Type: AWS::Cognito::UserPoolClient
-#   #   #   Properties:
-#   #   #     ClientName: ${self:custom.userPoolClientName}
-#   #   #     GenerateSecret: false
-#   #   #     UserPoolId: { Ref: UserPool }
-#   #   #     AccessTokenValidity: 5
-#   #   #     IdTokenValidity: 5
-#   #   #     ExplicitAuthFlows:
-#   #   #       - "ADMIN_NO_SRP_AUTH"
 
 functions:
+  verify-token:
+    handler: src/auth/authorizers/auth-authorizer.handler
+
   get-notes:
-    handler: src/notes/functions/get-notes.handler
+    handler: src/notes/handlers/get-notes.handler
     memorySize: 1024
     events:
       - httpApi:
           path: /notes
           method: get
+          authorizer:
+            name: verify-token
+            type: request
   create-note:
-    handler: src/notes/functions/create-note.handler
+    handler: src/notes/handlers/create-note.handler
     events:
       - httpApi:
           path: /notes
           method: post
+          authorizer:
+            name: verify-token
+            type: request
   get-note:
-    handler: src/notes/functions/get-note.handler
+    handler: src/notes/handlers/get-note.handler
     events:
       - httpApi:
           path: /notes/{id}
           method: get
+          authorizer:
+            name: verify-token
+            type: request
+  delete-note:
+    handler: src/notes/handlers/delete-note.handler
+    events:
+      - httpApi:
+          path: /notes/{id}
+          method: delete
+          authorizer:
+            name: verify-token
+            type: request
+  change-note-status:
+    handler: src/notes/handlers/change-note-status.handler
+    events:
+      - httpApi:
+          path: /notes/{id}/status
+          method: patch
+          authorizer:
+            name: verify-token
+            type: request
+  update-note:
+    handler: src/notes/handlers/update-note.handler
+    events:
+      - httpApi:
+          path: /notes/{id}
+          method: put
+          authorizer:
+            name: verify-token
+            type: request
+
+  create-account:
+    handler: src/auth/handlers/register.handler
+    events:
+      - httpApi:
+          path: /auth/register
+          method: post
+  login:
+    handler: src/auth/handlers/login.handler
+    events:
+      - httpApi:
+          path: /auth/login
+          method: post
 
 plugins:
-  - serverless-webpack 
+  - serverless-webpack
   - serverless-offline
