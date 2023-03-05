@@ -15,9 +15,9 @@ export const handler = async (event) => {
   }
 
   try {
-    await changeStatus(userId, id, body.status);
+   const note = await changeStatus(userId, id, body.status);
 
-    return respond(200, "Note status updated successfully.");
+    return respond(200, "Note status updated successfully.", note);
   } catch (error) {
     return handleError(error);
   }

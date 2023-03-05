@@ -1,12 +1,12 @@
-import jwt from 'jsonwebtoken'
-import { ulid } from 'ulid';
+import jwt from "jsonwebtoken";
 
-const generateAuthResponse = (principalId, effect, methodArn) => {
+const generateAuthResponse = (principalId, effect, methodArn, context = {}) => {
   const policyDocument = generatePolicyDocument(effect, methodArn);
 
   return {
     principalId,
     policyDocument,
+    context: context
   };
 };
 
@@ -25,26 +25,47 @@ const generatePolicyDocument = (effect, methodArn) => {
   };
 
   return policyDocument;
-}
+};
 
+/**
+ * Verify JWT token.
+ *
+ * @param {string} token
+ * @returns {any}
+ */
 const verifyToken = (token) => {
   const secret = process.env.SUPABASE_JWT_SECRET || "";
 
   return jwt.verify(token, secret);
-}
+};
 
-export const handler = async (event, context, callback) => {
-  const authorizationToken = (event.headers.Authorization || "").replace("Bearer ", "");
+const getToken = (event) => {
+  const bearerToken =
+    event.headers.authorization || event.headers.Authorization || "";
 
-  const methodArn = event.routeArn;
+  return bearerToken.replace("Bearer ", "");
+};
+
+export const handler = (event, context, callback) => {
+  const authorizationToken = getToken(event);
+
+  const methodArn = event.methodArn || event.routeArn;
 
   if (!authorizationToken || !methodArn) return callback(null, "Unauthorized");
 
   try {
-    const response = await verifyToken(authorizationToken);
+    const response = verifyToken(authorizationToken);
 
-    return callback(null, generateAuthResponse(response.sub, "Allow", methodArn));
-  }catch(error){
-    return callback(null, generateAuthResponse(ulid(), "Deny", methodArn));
+    if (response && response.sub) {
+      return callback(
+        null,
+        generateAuthResponse(response.sub, "Allow", methodArn, response)
+      );
+    }
+
+    return callback(null, generateAuthResponse("guest", "Deny", methodArn));
+  } catch (error) {
+    console.error(error);
+    return callback(null, generateAuthResponse("guest", "Deny", methodArn));
   }
 };

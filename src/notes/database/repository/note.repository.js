@@ -47,6 +47,7 @@ const getNotes = async (userId, status) => {
   const params = {
     TableName: TABLE_NAME,
     IndexName: "noteStatus",
+    ScanIndexForward: true,
     KeyConditionExpression: `#userId = :userId and #status = :status`,
     ExpressionAttributeNames: {
       "#userId": "userId",

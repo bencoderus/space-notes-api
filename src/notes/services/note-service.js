@@ -41,12 +41,25 @@ export const updateNote = async (userId, noteId, updateData) => {
   }
 
   const note = await getNote(userId, noteId);
+  const updated = {
+    ...note,
+    ...updateData,
+  }
 
-  return noteRepository.updateNote(userId, noteId, updateData);
+  await noteRepository.updateNote(userId, noteId, updateData);
+
+  return updated;
 };
 
 export const changeStatus = async (userId, noteId, status) => {
   const note = await getNote(userId, noteId);
 
-  return noteRepository.changeStatus(userId, noteId, status);
+  const updated = {
+    ...note,
+    status,
+  }
+
+  await noteRepository.changeStatus(userId, noteId, status);
+
+  return updated;
 };

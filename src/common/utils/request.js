@@ -7,14 +7,15 @@
  */
 export const parseRequest = (event) => {
   const authToken = (event.headers.authorization || "").replace("Bearer ", "")
+  const jwt =  event?.requestContext?.authorizer?.lambda;
 
   return {
     body: event.body ? JSON.parse(event.body) : {},
     params: event.pathParameters || {},
     query: event.queryStringParameters || {},
     headers: event.headers || {},
-    user: event?.requestContext?.authorizer?.jwt?.claims,
-    userId: event?.requestContext?.authorizer?.jwt?.claims?.sub,
+    user: jwt,
+    userId: jwt?.sub,
     authorizationToken: authToken
   };
 };

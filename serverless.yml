@@ -16,8 +16,7 @@ provider:
         type: request
         functionName: verify-token
         resultTtlInSeconds: 300
-        identitySource:
-          - $request.header.Authorization # this is ignored by serverless-offline but will default to the Authorization header anyway
+        
   iam:
     role:
       statements:

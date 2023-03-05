@@ -15,9 +15,9 @@ export const handler = async (event) => {
   }
 
   try {
-    await updateNote(userId, id, body);
+    const note = await updateNote(userId, id, body);
 
-    return respond(200, "Note updated successfully.");
+    return respond(200, "Note updated successfully.", note);
   } catch (error) {
     return handleError(error);
   }

@@ -11,7 +11,7 @@ export function respond(statusCode, message, data = null) {
   const headers = { "Content-Type": "application/json" };
 
   const responseData = {
-    status,
+    statusCode,
     message,
   };
 
