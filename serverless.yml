@@ -36,11 +36,12 @@ provider:
           Resource:
             - Fn::GetAtt: [NotesDynamoDBTable, Arn]
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.noteTableName}/index/*
+      
   environment:
     NOTES_TABLE_NAME: "${self:custom.noteTableName}"
     SUPABASE_URL: "https://kjosizddxhvvsajpuoxl.supabase.co"
-    SUPABASE_JWT_SECRET: "mFdY5YQ8w4r4gbZXA6kvOTkdC8fOs3Arub1L6B1NmiOfWA7tFdrpKUHrS2infIVeO2oZnbhR0hjGko0OrsRPqw=="
-    SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtqb3NpemRkeGh2dnNhanB1b3hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Nzc5MjYyNjMsImV4cCI6MTk5MzUwMjI2M30.BdNXRfv7aRa5oazBXRf48PAlvaFE7uM_NWsRAz-ejTc"
+    SUPABASE_JWT_SECRET: '${ssm:supabase_jwt_key}'
+    SUPABASE_KEY: '${ssm:supabase_key}'
 
 custom:
   userPoolName: "${self:provider.stage}-notes-api"
@@ -85,7 +86,6 @@ resources:
           ReadCapacityUnits: 3
           WriteCapacityUnits: 3
         TableName: ${self:custom.noteTableName}
-
 
 functions:
   verify-token:

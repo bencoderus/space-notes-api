@@ -9,7 +9,7 @@ export const handler = async (event) => {
   const validation = await validateRequest(loginSchema, body);
 
   if (validation.error) {
-    return respond(400, "Validation error", validation.error);
+    return respond(400, validation.error);
   }
 
   const response = await login(validation.validated);
@@ -17,8 +17,6 @@ export const handler = async (event) => {
   if (response.error) {
     return respond(400, response.error.message);
   }
-
-  console.log(response);
 
   return respond(200, "Login completed.", response.data.session);
 };

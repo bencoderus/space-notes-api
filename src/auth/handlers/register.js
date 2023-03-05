@@ -9,7 +9,7 @@ export const handler = async (event) => {
     const validation = await validateRequest(registerSchema, body);
 
     if (validation.error) {
-      return respond(400, "Validation error", validation.error);
+      return respond(400, validation.error);
     }
 
     const response = await createAccount(validation.validated);
