@@ -5,8 +5,6 @@ import { NOTE_STATUSES } from "../database/repository/note.repository";
 import { getNotes } from "../services/note-service";
 
 export const handler = async (event, context) => {
-  console.log(JSON.stringify(event), JSON.stringify(context));
-  
   const { query, userId } = parseRequest(event);
 
   const status = query.status || NOTE_STATUSES.ACTIVE;

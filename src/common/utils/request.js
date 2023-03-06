@@ -7,7 +7,7 @@
  */
 export const parseRequest = (event) => {
   const authToken = (event.headers.authorization || "").replace("Bearer ", "")
-  const jwt =  event?.requestContext?.authorizer?.lambda;
+  const jwt = getJwtContext(event);
 
   return {
     body: event.body ? JSON.parse(event.body) : {},
@@ -19,6 +19,10 @@ export const parseRequest = (event) => {
     authorizationToken: authToken
   };
 };
+
+const getJwtContext = (event) => {
+ return event?.requestContext?.authorizer?.lambda ||event?.requestContext?.authorizer;
+}
 
 export const validateRequest = async (schema, input = {}) => {
   try {

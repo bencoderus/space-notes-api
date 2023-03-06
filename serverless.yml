@@ -6,6 +6,7 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
+  timeout: 60
   tags:
     serviceName: notes-api
   stage: dev
@@ -16,6 +17,9 @@ provider:
         type: request
         functionName: verify-token
         resultTtlInSeconds: 300
+        enableSimpleResponses: true
+        identitySource:
+          - $request.header.Authorization
         
   iam:
     role:
@@ -92,68 +96,69 @@ functions:
 
   get-notes:
     handler: src/notes/handlers/get-notes.handler
-    memorySize: 1024
+    timeout: 60
     events:
       - httpApi:
           path: /notes
           method: get
           authorizer:
             name: verify-token
-            type: request
   create-note:
     handler: src/notes/handlers/create-note.handler
+    timeout: 60
     events:
       - httpApi:
           path: /notes
           method: post
           authorizer:
             name: verify-token
-            type: request
   get-note:
     handler: src/notes/handlers/get-note.handler
+    timeout: 60
     events:
       - httpApi:
           path: /notes/{id}
           method: get
           authorizer:
             name: verify-token
-            type: request
   delete-note:
     handler: src/notes/handlers/delete-note.handler
+    timeout: 60
     events:
       - httpApi:
           path: /notes/{id}
           method: delete
           authorizer:
             name: verify-token
-            type: request
   change-note-status:
     handler: src/notes/handlers/change-note-status.handler
+    timeout: 60
     events:
       - httpApi:
           path: /notes/{id}/status
           method: patch
           authorizer:
             name: verify-token
-            type: request
   update-note:
     handler: src/notes/handlers/update-note.handler
+    timeout: 60
     events:
       - httpApi:
           path: /notes/{id}
           method: put
           authorizer:
             name: verify-token
-            type: request
 
   create-account:
     handler: src/auth/handlers/register.handler
+    timeout: 60
     events:
       - httpApi:
           path: /auth/register
           method: post
   login:
     handler: src/auth/handlers/login.handler
+    timeout: 60
     events:
       - httpApi:
           path: /auth/login
