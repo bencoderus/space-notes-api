@@ -6,7 +6,6 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
-  timeout: 60
   tags:
     serviceName: notes-api
   stage: dev
@@ -16,7 +15,7 @@ provider:
       verify-token:
         type: request
         functionName: verify-token
-        resultTtlInSeconds: 300
+        resultTtlInSeconds: 600
         enableSimpleResponses: true
         identitySource:
           - $request.header.Authorization
@@ -96,7 +95,6 @@ functions:
 
   get-notes:
     handler: src/notes/handlers/get-notes.handler
-    timeout: 60
     events:
       - httpApi:
           path: /notes
@@ -105,7 +103,6 @@ functions:
             name: verify-token
   create-note:
     handler: src/notes/handlers/create-note.handler
-    timeout: 60
     events:
       - httpApi:
           path: /notes
@@ -114,7 +111,6 @@ functions:
             name: verify-token
   get-note:
     handler: src/notes/handlers/get-note.handler
-    timeout: 60
     events:
       - httpApi:
           path: /notes/{id}
@@ -123,7 +119,6 @@ functions:
             name: verify-token
   delete-note:
     handler: src/notes/handlers/delete-note.handler
-    timeout: 60
     events:
       - httpApi:
           path: /notes/{id}
@@ -132,7 +127,6 @@ functions:
             name: verify-token
   change-note-status:
     handler: src/notes/handlers/change-note-status.handler
-    timeout: 60
     events:
       - httpApi:
           path: /notes/{id}/status
@@ -141,7 +135,6 @@ functions:
             name: verify-token
   update-note:
     handler: src/notes/handlers/update-note.handler
-    timeout: 60
     events:
       - httpApi:
           path: /notes/{id}
@@ -151,14 +144,12 @@ functions:
 
   create-account:
     handler: src/auth/handlers/register.handler
-    timeout: 60
     events:
       - httpApi:
           path: /auth/register
           method: post
   login:
     handler: src/auth/handlers/login.handler
-    timeout: 60
     events:
       - httpApi:
           path: /auth/login

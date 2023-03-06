@@ -1,11 +1,9 @@
-import { DynamoDB } from "aws-sdk";
+import dynamoose from "dynamoose";
 
-const dynamoDbClientParams = {};
+export const createModel = (name, schema) => {
+  if (process.env.IS_OFFLINE) {
+    dynamoose.aws.ddb.local("http://localhost:4566");
+  }
 
-if (process.env.IS_OFFLINE) {
-  dynamoDbClientParams.region = "us-east-1";
-  dynamoDbClientParams.endpoint =
-    process.env.DYNAMODB_LOCAL_ENDPOINT || "http://localhost:4566";
+ return dynamoose.model(name, schema);
 }
-
-export const dynamoDb = new DynamoDB.DocumentClient(dynamoDbClientParams);
