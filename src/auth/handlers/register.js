@@ -15,9 +15,9 @@ export const handler = async (event) => {
     const response = await createAccount(validation.validated);
 
     if(response.error){
-       return respond(400, 'Unable to create account', response.error)
+       return respond(400, 'Unable to create account.', response.error)
     }
 
-   return respond(200, 'Account created successfully.', response.data.user)
+   return respond(201, 'Account created successfully, please verify your email.', response.data.user)
   };
   

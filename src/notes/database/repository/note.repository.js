@@ -15,10 +15,21 @@ export const NOTE_ACTION_STATUS = {
 
 const DEFAULT_STATUS = NOTE_STATUSES.ACTIVE;
 
-const getNotes = async (userId, status) => {
-  const notes = await Note.query({ userId, status }).sort("descending").exec();
+const getNotes = async (userId, status, lastKey) => {
+  const lastKeyData = lastKey ? JSON.parse(atob(lastKey)) : null;
 
-  return notes.toJSON();
+  const { count } = await Note.query({ userId, status }).count().exec();
+  const query = Note.query({ userId, status }).limit(2).sort("descending");
+
+  const notes = lastKeyData
+    ? await query.startAt(lastKeyData).exec()
+    : await query.exec();
+
+  return {
+    total: count,
+    records: notes.toJSON(),
+    lastKey: notes.lastKey ? btoa(JSON.stringify(notes.lastKey)) : null,
+  };
 };
 
 const getNote = async (userId, noteId) => {
@@ -50,7 +61,7 @@ const updateNote = async (userId, noteId, updateData) => {
 };
 
 const markAsDeleted = async (userId, noteId) => {
-  const status = NOTE_STATUSES.DELETED
+  const status = NOTE_STATUSES.DELETED;
   const deletedAt = new Date().toISOString();
 
   return Note.update({ userId, noteId, status, deletedAt });

@@ -3,8 +3,8 @@ import noteRepository, {
   NOTE_STATUSES,
 } from "../database/repository/note.repository";
 
-export const getNotes = async (userId, status) => {
-  const notes = await noteRepository.getNotes(userId, status);
+export const getNotes = async (userId, status, lastKey) => {
+  const notes = await noteRepository.getNotes(userId, status, lastKey);
 
   return notes;
 };
