@@ -6,9 +6,9 @@
   "author": "Benjamin Iduwe <bencoderus@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --exec serverless offline start",
-    "serve": "serverless offline start --reloadHandler",
-    "start": "serverless offline start",
+    "dev": "nodemon --exec serverless offline start --httpPort 3500",
+    "serve": "serverless offline start --reloadHandler  --httpPort 3500",
+    "start": "serverless offline start --httpPort 3500",
     "deploy": "serverless deploy"
   },
   "devDependencies": {

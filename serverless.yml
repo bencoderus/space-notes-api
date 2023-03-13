@@ -41,9 +41,11 @@ provider:
       
   environment:
     NOTES_TABLE_NAME: "${self:custom.noteTableName}"
+    APP_DOMAIN: 'localhost:3000'
     SUPABASE_URL: "https://kjosizddxhvvsajpuoxl.supabase.co"
     SUPABASE_JWT_SECRET: '${ssm:supabase_jwt_key}'
     SUPABASE_KEY: '${ssm:supabase_key}'
+    SUPABASE_SECRET_KEY: '${ssm:supabase_secret_key}'
 
 custom:
   userPoolName: "${self:provider.stage}-notes-api"
@@ -154,6 +156,19 @@ functions:
       - httpApi:
           path: /auth/login
           method: post
+  forgot-password:
+    handler: src/auth/handlers/forgot-password.handler
+    events:
+      - httpApi:
+          path: /auth/forgot-password
+          method: post
+  reset-password:
+    handler: src/auth/handlers/reset-password.handler
+    events:
+      - httpApi:
+          path: /auth/reset-password
+          method: post
+
 
 plugins:
   - serverless-webpack

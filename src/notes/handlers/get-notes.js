@@ -1,7 +1,6 @@
 import { handleError } from "../../common/utils/handle-error";
 import { parseRequest } from "../../common/utils/request";
 import { respond } from "../../common/utils/response";
-import { Note } from "../database/models/note.model";
 import { NOTE_STATUSES } from "../database/repository/note.repository";
 import { getNotes } from "../services/note-service";
 

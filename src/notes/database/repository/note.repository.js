@@ -19,7 +19,7 @@ const getNotes = async (userId, status, lastKey) => {
   const lastKeyData = lastKey ? JSON.parse(atob(lastKey)) : null;
 
   const { count } = await Note.query({ userId, status }).count().exec();
-  const query = Note.query({ userId, status }).limit(2).sort("descending");
+  const query = Note.query({ userId, status }).limit(12).sort("descending");
 
   const notes = lastKeyData
     ? await query.startAt(lastKeyData).exec()
