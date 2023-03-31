@@ -21,7 +21,9 @@
     "serverless-offline-watcher": "^1.0.2",
     "serverless-webpack": "^5.11.0",
     "webpack": "^5.75.0",
-    "webpack-node-externals": "^3.0.0"
+    "webpack-node-externals": "^3.0.0",
+    "sst": "^2.0.30",
+    "constructs": "10.1.156"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.10.0",

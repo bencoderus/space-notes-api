@@ -3,8 +3,8 @@ import noteRepository, {
   NOTE_STATUSES,
 } from "../database/repository/note.repository";
 
-export const getNotes = async (userId, status, lastKey) => {
-  const notes = await noteRepository.getNotes(userId, status, lastKey);
+export const getNotes = async (userId, status, lastKey, limit) => {
+  const notes = await noteRepository.getNotes(userId, status, lastKey, limit);
 
   return notes;
 };
@@ -59,6 +59,10 @@ export const changeStatus = async (userId, noteId, status) => {
       "You can not change the status of a deleted note.",
       400
     );
+  }
+
+  if (note.status === status) {
+    throw new HttpError("Note already has this status.", 400);
   }
 
   const updated = {

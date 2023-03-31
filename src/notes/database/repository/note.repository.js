@@ -1,6 +1,8 @@
 import { ulid } from "ulid";
 import { Note } from "../models/note.model";
 
+export const NOTE_LIMIT = 100;
+
 export const NOTE_STATUSES = {
   ACTIVE: "active",
   ARCHIVED: "archived",
@@ -9,24 +11,28 @@ export const NOTE_STATUSES = {
 };
 
 export const NOTE_ACTION_STATUS = {
+  active: NOTE_STATUSES.ACTIVE,
   pin: NOTE_STATUSES.PINNED,
   archive: NOTE_STATUSES.ARCHIVED,
 };
 
 const DEFAULT_STATUS = NOTE_STATUSES.ACTIVE;
 
-const getNotes = async (userId, status, lastKey) => {
+const getNotes = async (userId, status, lastKey, limit) => {
   const lastKeyData = lastKey ? JSON.parse(atob(lastKey)) : null;
+  const baseQuery = Note.query({ userId, status });
 
-  const { count } = await Note.query({ userId, status }).count().exec();
-  const query = Note.query({ userId, status }).limit(12).sort("descending");
+  const { count } = await baseQuery.count().exec();
+  const query = Note.query({ userId, status }).limit(limit)
 
   const notes = lastKeyData
     ? await query.startAt(lastKeyData).exec()
     : await query.exec();
 
   return {
+    count: notes.count,
     total: count,
+    limit: limit,
     records: notes.toJSON(),
     lastKey: notes.lastKey ? btoa(JSON.stringify(notes.lastKey)) : null,
   };

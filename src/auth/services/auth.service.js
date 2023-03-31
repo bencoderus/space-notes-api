@@ -22,6 +22,12 @@ export const getToken = (event) => {
   return bearerToken.replace("Bearer ", "");
 };
 
+/**
+ * Create an account.
+ * 
+ * @param {Record<string, any>} params
+ * @returns {Promise<Record<string, any>>}
+ */
 export const createAccount = async ({ email, password, name }) => {
   return supabase().auth.signUp({
     email,
@@ -34,6 +40,12 @@ export const createAccount = async ({ email, password, name }) => {
   });
 };
 
+/**
+ * Validate user credentials and generate JWT token.
+ * 
+ * @param {Record<string, any>} params 
+ * @returns {Promise<Record<string, any>>}
+ */
 export const login = async ({ email, password }) => {
   return supabase().auth.signInWithPassword({
     email,
@@ -41,6 +53,12 @@ export const login = async ({ email, password }) => {
   });
 };
 
+/**
+ * Request password reset using the user's credentials.
+ * 
+ * @param {Record<string, any>} param0 
+ * @returns {Promise<Record<string, any>>}
+ */
 export const forgotPassword = async ({ email, redirectTo }) => {
   const domain = process.env.APP_DOMAIN || "";
 
@@ -59,6 +77,12 @@ export const forgotPassword = async ({ email, redirectTo }) => {
   });
 };
 
+/**
+ * Reset password using the access token.
+ * 
+ * @param {Record<string, any>} param0 
+ * @returns {Promise<Record<string, any>>}
+ */
 export const resetPassword = async ({ password }, accessToken) => {
   const token = verifyToken(accessToken);
 
@@ -80,25 +104,6 @@ export const resetPassword = async ({ password }, accessToken) => {
   }
 
   return updateResponse.data.user;
-};
-
-export const authorizeUsingEvent = async (event) => {
-  const accessToken = (
-    event.headers.Authorization ||
-    event.headers.authorization ||
-    ""
-  ).replace("Bearer ", "");
-
-  const response = await supabase().auth.getUser(accessToken);
-
-  if (response.error) {
-    throw new HttpError(response.error.message, 401, response.error);
-  }
-
-  return {
-    user: response?.data?.user,
-    userId: response?.data?.user?.id,
-  };
 };
 
 export const getUser = async (accessToken) => {

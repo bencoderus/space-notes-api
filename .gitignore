@@ -129,6 +129,10 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# sst
+.sst
+.build
+
 
 # package directories
 jspm_packages
