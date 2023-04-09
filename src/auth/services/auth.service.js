@@ -57,7 +57,7 @@ export const login = async ({ email, password }) => {
 /**
  * Request password reset using the user's credentials.
  * 
- * @param {Record<string, any>} param0 
+ * @param {{email: string, redirectTo: string}} param0 
  * @returns {Promise<Record<string, any>>}
  */
 export const forgotPassword = async ({ email, redirectTo }) => {
@@ -69,7 +69,7 @@ export const forgotPassword = async ({ email, redirectTo }) => {
 
   const regex = new RegExp(`(http|https)\:\/\/${domain}\/(.*)`, "i");
 
-  if (!regex.test(redirectTo)) {
+  if (!redirectTo.includes('//localhost') && !regex.test(redirectTo) ) {
     throw new HttpError("Redirect Url is not valid", 400);
   }
 

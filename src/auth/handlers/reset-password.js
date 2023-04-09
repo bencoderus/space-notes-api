@@ -1,3 +1,4 @@
+import { handleError } from "../../common/utils/handle-error";
 import { parseRequest, validateRequest } from "../../common/utils/request";
 import { respond } from "../../common/utils/response";
 import { resetPasswordSchema } from "../request-schemas/auth.schema";
@@ -12,8 +13,12 @@ export const handler = async (event) => {
     return respond(400, validation.error);
   }
 
-  const accessToken = getToken(event);
-  await resetPassword(validation.validated, accessToken);
+  try {
+    const accessToken = getToken(event);
+    await resetPassword(validation.validated, accessToken);
 
-  return respond(200, "Password reset successfully.");
+    return respond(200, "Password reset successfully.");
+  } catch (error) {
+    return handleError(error);
+  }
 };

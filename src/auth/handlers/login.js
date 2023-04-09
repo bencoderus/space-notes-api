@@ -1,3 +1,4 @@
+import { handleError } from "../../common/utils/handle-error";
 import { parseRequest, validateRequest } from "../../common/utils/request";
 import { respond } from "../../common/utils/response";
 import { loginSchema } from "../request-schemas/auth.schema";
@@ -11,12 +12,15 @@ export const handler = async (event) => {
   if (validation.error) {
     return respond(400, validation.error);
   }
+  try {
+    const response = await login(validation.validated);
 
-  const response = await login(validation.validated);
+    if (response.error) {
+      return respond(400, response.error.message);
+    }
 
-  if (response.error) {
-    return respond(400, response.error.message);
+    return respond(200, "Login completed.", response.data.session);
+  } catch (error) {
+    return handleError(error);
   }
-
-  return respond(200, "Login completed.", response.data.session);
 };
