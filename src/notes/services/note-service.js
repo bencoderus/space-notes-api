@@ -54,7 +54,7 @@ export const updateNote = async (userId, noteId, updateData) => {
 export const changeStatus = async (userId, noteId, status) => {
   const note = await getNote(userId, noteId);
 
-  if (note.status === NOTE_STATUSES.DELETED) {
+  if (note.status === NOTE_STATUSES.DELETED && status !== NOTE_STATUSES.ACTIVE) {
     throw new HttpError(
       "You can not change the status of a deleted note.",
       400

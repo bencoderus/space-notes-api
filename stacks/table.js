@@ -1,7 +1,7 @@
 import { Table } from "sst/constructs";
 
-export function DynamoTable({ stack }) {
-  const noteTable = new Table(stack, "Notes", {
+export function DynamoTable(stack) {
+  const noteTable = new Table(stack, "notes", {
     fields: {
       userId: "string",
       noteId: "string",

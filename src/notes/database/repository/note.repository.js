@@ -59,7 +59,8 @@ const deleteNote = async (userId, noteId) => {
 };
 
 const changeStatus = async (userId, noteId, status) => {
-  return Note.update({ userId, noteId, status });
+  const deletedAt = null;
+  return Note.update({ userId, noteId, status, deletedAt });
 };
 
 const updateNote = async (userId, noteId, updateData) => {

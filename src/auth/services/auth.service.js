@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.SUPABASE_KEY || "";
+const SUPABASE_JWT_KEY = process.env.SUPABASE_JWT_SECRET || "";
 const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || "";
 
 const supabase = () => createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -116,7 +117,6 @@ export const getUser = async (accessToken) => {
  * @returns {any}
  */
 export const verifyToken = (token) => {
-  const secret = process.env.SUPABASE_JWT_SECRET || "";
 
   if (!token) {
     return {
@@ -128,7 +128,7 @@ export const verifyToken = (token) => {
   let valid = false;
   let decoded = null;
 
-  jwt.verify(token, secret, (error, value) => {
+  jwt.verify(token, SUPABASE_JWT_KEY, (error, value) => {
     valid = error ? false : true;
     decoded = value;
   });

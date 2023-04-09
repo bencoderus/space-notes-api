@@ -1,20 +1,43 @@
 import { Api } from "sst/constructs";
 import { Function } from "sst/constructs";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
+
 import { DynamoTable } from "./table";
 
 export function API({ stack }) {
   const tables = DynamoTable(stack);
+  const environment = process.env.NODE_ENV || "dev";
+
+  const environmentVariables = {
+    APP_ENV: environment, 
+    NOTES_TABLE_NAME: tables.noteTable.tableName,
+    APP_DOMAIN: StringParameter.valueForStringParameter(
+      stack,
+      `/space-notes/${environment}/app_domain`
+    ).toString(), 
+    SUPABASE_URL: "https://kjosizddxhvvsajpuoxl.supabase.co",
+    SUPABASE_JWT_SECRET: StringParameter.valueForStringParameter(
+      stack,
+      `supabase_jwt_key`
+    ).toString(),
+    SUPABASE_KEY: StringParameter.valueForStringParameter(
+      stack,
+      `supabase_key`
+    ).toString(),
+    SUPABASE_SECRET_KEY: StringParameter.valueForStringParameter(
+      stack,
+      `supabase_secret_key`
+    ).toString(),
+  };
 
   const api = new Api(stack, "api", {
-    cors: {
-      allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    },
+    cors: true,
     authorizers: {
       verifyToken: {
         type: "lambda",
         function: new Function(stack, "Authorizer", {
           handler: "src/auth/authorizers/auth-authorizer.handler",
+          environment: environmentVariables
         }),
         resultsCacheTtl: "30 seconds",
         responseTypes: ["simple"],
@@ -23,23 +46,8 @@ export function API({ stack }) {
     },
     defaults: {
       function: {
-        environment: {
-          NOTES_TABLE_NAME: tables.noteTable.tableName,
-          APP_DOMAIN: "localhost:3000",
-          SUPABASE_URL: "https://kjosizddxhvvsajpuoxl.supabase.co",
-          SUPABASE_JWT_SECRET: StringParameter.valueForStringParameter(
-            stack,
-            `supabase_jwt_key`
-          ),
-          SUPABASE_KEY: StringParameter.valueForStringParameter(
-            stack,
-            `supabase_key`
-          ),
-          SUPABASE_SECRET_KEY: StringParameter.valueForStringParameter(
-            stack,
-            `supabase_secret_key`
-          ),
-        },
+        memorySize: "1024 MB",
+        environment: environmentVariables
       },
     },
     routes: {

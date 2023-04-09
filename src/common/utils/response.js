@@ -8,7 +8,11 @@
  */
 export function respond(statusCode, message, data = null) {
   const status = statusCode >= 200 && statusCode <= 210;
-  const headers = { "Content-Type": "application/json" };
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": true,
+  };
 
   const responseData = {
     statusCode,
