@@ -9,12 +9,12 @@ export function API({ stack }) {
   const environment = process.env.NODE_ENV || "dev";
 
   const environmentVariables = {
-    APP_ENV: environment, 
+    APP_ENV: environment,
     NOTES_TABLE_NAME: tables.noteTable.tableName,
     APP_DOMAIN: StringParameter.valueForStringParameter(
       stack,
       `/space-notes/${environment}/app_domain`
-    ).toString(), 
+    ).toString(),
     SUPABASE_URL: "https://kjosizddxhvvsajpuoxl.supabase.co",
     SUPABASE_JWT_SECRET: StringParameter.valueForStringParameter(
       stack,
@@ -37,7 +37,7 @@ export function API({ stack }) {
         type: "lambda",
         function: new Function(stack, "Authorizer", {
           handler: "src/auth/authorizers/auth-authorizer.handler",
-          environment: environmentVariables
+          environment: environmentVariables,
         }),
         resultsCacheTtl: "30 seconds",
         responseTypes: ["simple"],
@@ -47,7 +47,7 @@ export function API({ stack }) {
     defaults: {
       function: {
         memorySize: "1024 MB",
-        environment: environmentVariables
+        environment: environmentVariables,
       },
     },
     routes: {
@@ -89,6 +89,12 @@ export function API({ stack }) {
       },
       "POST   /auth/reset-password": {
         function: "src/auth/handlers/reset-password.handler",
+      },
+      "POST   /auth/social-login": {
+        function: "src/auth/handlers/login-with-social.handler",
+      },
+      "GET   /auth/user": {
+        function: "src/auth/handlers/get-user.handler",
       },
     },
   });

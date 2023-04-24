@@ -25,7 +25,7 @@ export const getToken = (event) => {
 
 /**
  * Create an account.
- * 
+ *
  * @param {Record<string, any>} params
  * @returns {Promise<Record<string, any>>}
  */
@@ -43,8 +43,8 @@ export const createAccount = async ({ email, password, name }) => {
 
 /**
  * Validate user credentials and generate JWT token.
- * 
- * @param {Record<string, any>} params 
+ *
+ * @param {Record<string, any>} params
  * @returns {Promise<Record<string, any>>}
  */
 export const login = async ({ email, password }) => {
@@ -56,11 +56,19 @@ export const login = async ({ email, password }) => {
 
 /**
  * Request password reset using the user's credentials.
- * 
- * @param {{email: string, redirectTo: string}} param0 
+ *
+ * @param {{email: string, redirectTo: string}} param0
  * @returns {Promise<Record<string, any>>}
  */
 export const forgotPassword = async ({ email, redirectTo }) => {
+  validateRedirectUrl(redirectTo);
+
+  return supabase().auth.resetPasswordForEmail(email, {
+    redirectTo,
+  });
+};
+
+const validateRedirectUrl = (redirectTo) => {
   const domain = process.env.APP_DOMAIN || "";
 
   if (!domain) {
@@ -69,19 +77,49 @@ export const forgotPassword = async ({ email, redirectTo }) => {
 
   const regex = new RegExp(`(http|https)\:\/\/${domain}\/(.*)`, "i");
 
-  if (!redirectTo.includes('//localhost') && !regex.test(redirectTo) ) {
+  if (!redirectTo.includes("//localhost") && !regex.test(redirectTo)) {
     throw new HttpError("Redirect Url is not valid", 400);
   }
 
-  return supabase().auth.resetPasswordForEmail(email, {
-    redirectTo: redirectTo,
+  return redirectTo;
+};
+
+/**
+ * Login with google
+ */
+const signInWithGoogle = async (redirectTo) => {
+  return supabase().auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo,
+      queryParams: {
+        access_type: "offline",
+        prompt: "consent",
+      },
+    },
   });
+};
+
+export const signInWithSocial = async ({ provider, redirectTo }) => {
+  validateRedirectUrl(redirectTo);
+
+  const providers = {
+    google: signInWithGoogle,
+  };
+
+  const providerAction = providers[provider];
+
+  if (!providerAction) {
+    throw new HttpError("Provider is not supported.");
+  }
+
+  return providerAction(redirectTo);
 };
 
 /**
  * Reset password using the access token.
- * 
- * @param {Record<string, any>} param0 
+ *
+ * @param {Record<string, any>} param0
  * @returns {Promise<Record<string, any>>}
  */
 export const resetPassword = async ({ password }, accessToken) => {
@@ -117,7 +155,6 @@ export const getUser = async (accessToken) => {
  * @returns {any}
  */
 export const verifyToken = (token) => {
-
   if (!token) {
     return {
       valid: false,

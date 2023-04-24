@@ -11,6 +11,11 @@ export const loginSchema = object().shape({
     password: string().required().min(8)
 });
 
+export const loginWithSocialSchema = object().shape({
+    provider: string().required(),
+    redirectTo: string().required()
+});
+
 export const forgotPasswordSchema = object().shape({
     email: string().required().email(),
     redirectTo: string().required()

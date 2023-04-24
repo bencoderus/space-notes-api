@@ -156,6 +156,18 @@ functions:
       - httpApi:
           path: /auth/login
           method: post
+  loginWithSocial:
+    handler: src/auth/handlers/login-with-social.handler
+    events:
+      - httpApi:
+          path: /auth/social-login
+          method: post
+  getUser:
+    handler: src/auth/handlers/get-user.handler
+    events:
+      - httpApi:
+          path: /auth/user
+          method: get
   forgot-password:
     handler: src/auth/handlers/forgot-password.handler
     events:
