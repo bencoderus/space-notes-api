@@ -8,14 +8,15 @@
 export const parseRequest = (event) => {
   const authToken = (event.headers.authorization || "").replace("Bearer ", "")
   const jwt = getJwtContext(event);
+  const user = event?.requestContext?.user;
 
   return {
     body: event.body ? JSON.parse(event.body) : {},
     params: event.pathParameters || {},
     query: event.queryStringParameters || {},
     headers: event.headers || {},
-    user: jwt,
-    userId: jwt?.sub,
+    user: jwt || user,
+    userId: jwt?.sub || user?.sub,
     authorizationToken: authToken
   };
 };

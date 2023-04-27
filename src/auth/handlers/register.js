@@ -1,10 +1,11 @@
+import { handleApiRequest } from "../../common/middlewares/base.middleware";
 import { handleError } from "../../common/utils/handle-error";
 import { parseRequest, validateRequest } from "../../common/utils/request";
 import { respond } from "../../common/utils/response";
 import { registerSchema } from "../request-schemas/auth.schema";
 import { createAccount } from "../services/auth.service";
 
-export const handler = async (event) => {
+export const handler = handleApiRequest(async (event) => {
   const { body } = parseRequest(event);
 
   const validation = await validateRequest(registerSchema, body);
@@ -28,4 +29,4 @@ export const handler = async (event) => {
   } catch (error) {
     return handleError(error);
   }
-};
+});

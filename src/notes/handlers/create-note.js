@@ -1,10 +1,11 @@
-import { handleError } from "../../common/utils/handle-error";
 import { parseRequest, validateRequest } from "../../common/utils/request";
 import { respond } from "../../common/utils/response";
 import { createNoteSchema } from "../request-schemas/note.schema";
 import { createNote } from "../services/note-service";
+import { authenticate } from "../../auth/middlewares/auth.middleware";
+import { handleApiRequest } from "../../common/middlewares/base.middleware";
 
-export const handler = async (event) => {
+export const handler = handleApiRequest(async (event) => {
   const { body, userId } = parseRequest(event);
   const validation = await validateRequest(createNoteSchema, body);
 
@@ -12,11 +13,7 @@ export const handler = async (event) => {
     return respond(400, validation.error);
   }
 
-  try {
-    const note = await createNote(userId, validation.validated);
+  const note = await createNote(userId, validation.validated);
 
-    return respond(200, "Notes created successfully.", note);
-  } catch (error) {
-    return handleError(error);
-  }
-};
+  return respond(200, "Notes created successfully.", note);
+}).use(authenticate());

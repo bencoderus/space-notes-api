@@ -11,15 +11,7 @@ provider:
   stage: dev
   httpApi:
     cors: true
-    authorizers:
-      verify-token:
-        type: request
-        functionName: verify-token
-        resultTtlInSeconds: 600
-        enableSimpleResponses: true
-        identitySource:
-          - $request.header.Authorization
-        
+
   iam:
     role:
       statements:
@@ -92,57 +84,47 @@ resources:
         TableName: ${self:custom.noteTableName}
 
 functions:
-  verify-token:
-    handler: src/auth/authorizers/auth-authorizer.handler
-
   get-notes:
     handler: src/notes/handlers/get-notes.handler
     events:
       - httpApi:
           path: /notes
           method: get
-          authorizer:
-            name: verify-token
+          
   create-note:
     handler: src/notes/handlers/create-note.handler
     events:
       - httpApi:
           path: /notes
           method: post
-          authorizer:
-            name: verify-token
+
   get-note:
     handler: src/notes/handlers/get-note.handler
     events:
       - httpApi:
           path: /notes/{id}
           method: get
-          authorizer:
-            name: verify-token
+          
   delete-note:
     handler: src/notes/handlers/delete-note.handler
     events:
       - httpApi:
           path: /notes/{id}
           method: delete
-          authorizer:
-            name: verify-token
+
   change-note-status:
     handler: src/notes/handlers/change-note-status.handler
     events:
       - httpApi:
           path: /notes/{id}/status
           method: patch
-          authorizer:
-            name: verify-token
+
   update-note:
     handler: src/notes/handlers/update-note.handler
     events:
       - httpApi:
           path: /notes/{id}
           method: put
-          authorizer:
-            name: verify-token
 
   create-account:
     handler: src/auth/handlers/register.handler

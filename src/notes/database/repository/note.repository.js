@@ -22,8 +22,14 @@ const getNotes = async (userId, status, lastKey, limit) => {
   const lastKeyData = lastKey ? JSON.parse(atob(lastKey)) : null;
   const baseQuery = Note.query({ userId, status });
 
+  const queryAttributes = {userId};
+
+  if(status) {
+    queryAttributes['status'] = status;
+  }
+
   const { count } = await baseQuery.count().exec();
-  const query = Note.query({ userId, status }).limit(limit)
+  const query = Note.query(queryAttributes).limit(limit)
 
   const notes = lastKeyData
     ? await query.startAt(lastKeyData).exec()

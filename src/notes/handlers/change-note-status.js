@@ -1,10 +1,11 @@
-import { handleError } from "../../common/utils/handle-error";
 import { parseRequest, validateRequest } from "../../common/utils/request";
 import { respond } from "../../common/utils/response";
 import { changeStatusSchema } from "../request-schemas/note.schema";
 import { changeStatus } from "../services/note-service";
+import { handleApiRequest } from "../../common/middlewares/base.middleware";
+import { authenticate } from "../../auth/middlewares/auth.middleware";
 
-export const handler = async (event) => {
+export const handler = handleApiRequest(async (event) => {
   const { params, userId, body } = parseRequest(event);
   const { id } = params;
 
@@ -14,11 +15,7 @@ export const handler = async (event) => {
     return respond(400, validation.error);
   }
 
-  try {
-   const note = await changeStatus(userId, id, body.status);
+  const note = await changeStatus(userId, id, body.status);
 
-    return respond(200, "Note status updated successfully.", note);
-  } catch (error) {
-    return handleError(error);
-  }
-};
+  return respond(200, "Note status updated successfully.", note);
+}).use(authenticate());

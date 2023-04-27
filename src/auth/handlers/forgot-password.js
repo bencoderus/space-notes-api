@@ -1,9 +1,10 @@
+import { handleApiRequest } from "../../common/middlewares/base.middleware";
 import { parseRequest, validateRequest } from "../../common/utils/request";
 import { respond } from "../../common/utils/response";
 import { forgotPasswordSchema } from "../request-schemas/auth.schema";
 import { forgotPassword } from "../services/auth.service";
 
-export const handler = async (event) => {
+export const handler = handleApiRequest(async (event) => {
     const { body } = parseRequest(event);
   
     const validation = await validateRequest(forgotPasswordSchema, body);
@@ -19,5 +20,5 @@ export const handler = async (event) => {
     }
 
    return respond(200, 'A password reset link has been sent to your email.')
-  };
+  });
   

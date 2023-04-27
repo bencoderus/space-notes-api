@@ -32,18 +32,6 @@ export function API({ stack }) {
 
   const api = new Api(stack, "api", {
     cors: true,
-    authorizers: {
-      verifyToken: {
-        type: "lambda",
-        function: new Function(stack, "Authorizer", {
-          handler: "src/auth/authorizers/auth-authorizer.handler",
-          environment: environmentVariables,
-        }),
-        resultsCacheTtl: "30 seconds",
-        responseTypes: ["simple"],
-        identitySource: ["$request.header.Authorization"],
-      },
-    },
     defaults: {
       function: {
         memorySize: "1024 MB",
@@ -54,27 +42,21 @@ export function API({ stack }) {
       // Notes routes.
       "GET    /notes": {
         function: "src/notes/handlers/get-notes.handler",
-        authorizer: "verifyToken",
       },
       "POST   /notes": {
         function: "src/notes/handlers/create-note.handler",
-        authorizer: "verifyToken",
       },
       "GET    /notes/{id}": {
         function: "src/notes/handlers/get-note.handler",
-        authorizer: "verifyToken",
       },
       "PUT    /notes/{id}": {
         function: "src/notes/handlers/update-note.handler",
-        authorizer: "verifyToken",
       },
       "DELETE /notes/{id}": {
         function: "src/notes/handlers/delete-note.handler",
-        authorizer: "verifyToken",
       },
       "PATCH /notes/{id}/status": {
         function: "src/notes/handlers/change-note-status.handler",
-        authorizer: "verifyToken",
       },
 
       // Authentication routes.

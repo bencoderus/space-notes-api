@@ -1,9 +1,8 @@
-import { handleError } from "../../common/utils/handle-error";
+import { handleApiRequest } from "../../common/middlewares/base.middleware";
 import { respond } from "../../common/utils/response";
 import { getToken, getUser, } from "../services/auth.service";
 
-export const handler = async (event) => {
-  try {
+export const handler = handleApiRequest(async (event) => {
     const accessToken = getToken(event);
 
     if (!accessToken) {
@@ -16,7 +15,4 @@ export const handler = async (event) => {
     }
 
     return respond(200, "User retrieved successfully.", data);
-  } catch (error) {
-    return handleError(error);
-  }
-};
+});
