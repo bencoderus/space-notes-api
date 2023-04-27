@@ -14,7 +14,7 @@ export const handler = handleApiRequest(async (event) => {
     return respond(400, validation.error);
   }
 
-  try {
+
     const response = await createAccount(validation.validated);
 
     if (response.error) {
@@ -26,7 +26,4 @@ export const handler = handleApiRequest(async (event) => {
       "Account created successfully, please verify your email.",
       response.data.user
     );
-  } catch (error) {
-    return handleError(error);
-  }
 });
