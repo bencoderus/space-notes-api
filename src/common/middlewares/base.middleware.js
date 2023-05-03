@@ -1,4 +1,10 @@
-import middy from "@middy/core";
-import { handleRequestError } from "./error.middleware";
+import middy from "@middy/core"
+import { handleRequestError } from "./error.middleware"
 
-export const handleApiRequest = (handler) => middy(handler).use(handleRequestError)
+/**
+ * Handle API requests.
+ *
+ * @param {any} handler
+ * @returns {any}
+ */
+export const http = (handler) => middy(handler).use(handleRequestError())

@@ -1,5 +1,4 @@
 import { Api } from "sst/constructs";
-import { Function } from "sst/constructs";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 import { DynamoTable } from "./table";

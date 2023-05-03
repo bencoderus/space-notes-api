@@ -1,26 +1,26 @@
-import { object, string } from "yup";
+import { object, string } from "yup"
 
 export const registerSchema = object().shape({
-    name: string().required(),
-    email: string().required().email(),
-    password: string().required().min(8)
-});
+  name: string().required(),
+  email: string().required().email(),
+  password: string().required().min(8)
+})
 
 export const loginSchema = object().shape({
-    email: string().required().email(),
-    password: string().required().min(8)
-});
+  email: string().required().email(),
+  password: string().required().min(8)
+})
 
 export const loginWithSocialSchema = object().shape({
-    provider: string().required(),
-    redirectTo: string().required()
-});
+  provider: string().required(),
+  redirectTo: string().required()
+})
 
 export const forgotPasswordSchema = object().shape({
-    email: string().required().email(),
-    redirectTo: string().required()
-});
+  email: string().required().email(),
+  redirectTo: string().required()
+})
 
 export const resetPasswordSchema = object().shape({
-    password: string().required().min(8)
-});
+  password: string().required().min(8)
+})

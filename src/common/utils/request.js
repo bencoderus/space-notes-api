@@ -1,3 +1,5 @@
+import { validateSchema } from 'webpack'
+
 /**
  * Parse requests to get headers, body, queryString and path parameter.
  *
@@ -7,8 +9,8 @@
  */
 export const parseRequest = (event) => {
   const authToken = (event.headers.authorization || "").replace("Bearer ", "")
-  const jwt = getJwtContext(event);
-  const user = event?.requestContext?.user;
+  const jwt = getJwtContext(event)
+  const user = event?.requestContext?.user
 
   return {
     body: event.body ? JSON.parse(event.body) : {},
@@ -18,27 +20,30 @@ export const parseRequest = (event) => {
     user: jwt || user,
     userId: jwt?.sub || user?.sub,
     authorizationToken: authToken
-  };
-};
+  }
+}
 
 const getJwtContext = (event) => {
- return event?.requestContext?.authorizer?.lambda ||event?.requestContext?.authorizer;
+  return (
+    event?.requestContext?.authorizer?.lambda ||
+    event?.requestContext?.authorizer
+  )
 }
 
 export const validateRequest = async (schema, input = {}) => {
   try {
-    const validated = await schema.validate(input);
+    const validated = await schema.validate(input)
 
     return {
       validated,
       input,
-      error: null,
-    };
+      error: null
+    }
   } catch (error) {
     return {
       validated: null,
       input,
-      error: error.message,
-    };
+      error: error.message
+    }
   }
-};
+}

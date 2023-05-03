@@ -1,76 +1,76 @@
-import { HttpError } from "../../common/errors/http.error";
+import { HttpError } from "../../common/errors/http.error"
 import noteRepository, {
-  NOTE_STATUSES,
-} from "../database/repository/note.repository";
+  NOTE_STATUSES
+} from "../database/repository/note.repository"
 
 export const getNotes = async (userId, status, lastKey, limit) => {
-  const notes = await noteRepository.getNotes(userId, status, lastKey, limit);
+  const notes = await noteRepository.getNotes(userId, status, lastKey, limit)
 
-  return notes;
-};
+  return notes
+}
 
 export const getNote = async (userId, noteId) => {
-  const note = await noteRepository.getNote(userId, noteId);
+  const note = await noteRepository.getNote(userId, noteId)
 
   if (!note) {
-    throw new HttpError("Note was not found", 404);
+    throw new HttpError("Note was not found", 404)
   }
 
-  return note;
-};
+  return note
+}
 
 export const createNote = async (userId, createData) => {
-  return noteRepository.createNote(userId, createData);
-};
+  return noteRepository.createNote(userId, createData)
+}
 
 export const deleteNote = async (userId, noteId) => {
-  const note = await getNote(userId, noteId);
+  const note = await getNote(userId, noteId)
 
   if (note.status === NOTE_STATUSES.DELETED) {
-    throw new HttpError("Note is already deleted.", 400);
+    throw new HttpError("Note is already deleted.", 400)
   }
 
-  return noteRepository.deleteNote(userId, noteId);
-};
+  return noteRepository.deleteNote(userId, noteId)
+}
 
 export const updateNote = async (userId, noteId, updateData) => {
-  const isEmpty = (updateData) => Object.keys(updateData).length === 0;
+  const isEmpty = (updateData) => Object.keys(updateData).length === 0
 
   if (isEmpty(updateData)) {
-    throw new HttpError("Please specify the field(s) you want update.", 400);
+    throw new HttpError("Please specify the field(s) you want update.", 400)
   }
 
-  const note = await getNote(userId, noteId);
+  const note = await getNote(userId, noteId)
   const updated = {
     ...note,
-    ...updateData,
-  };
+    ...updateData
+  }
 
-  await noteRepository.updateNote(userId, noteId, updateData);
+  await noteRepository.updateNote(userId, noteId, updateData)
 
-  return updated;
-};
+  return updated
+}
 
 export const changeStatus = async (userId, noteId, status) => {
-  const note = await getNote(userId, noteId);
+  const note = await getNote(userId, noteId)
 
-  if (note.status === NOTE_STATUSES.DELETED && status !== NOTE_STATUSES.ACTIVE) {
-    throw new HttpError(
-      "You can not change the status of a deleted note.",
-      400
-    );
+  if (
+    note.status === NOTE_STATUSES.DELETED &&
+    status !== NOTE_STATUSES.ACTIVE
+  ) {
+    throw new HttpError("You can not change the status of a deleted note.", 400)
   }
 
   if (note.status === status) {
-    throw new HttpError("Note already has this status.", 400);
+    throw new HttpError("Note already has this status.", 400)
   }
 
   const updated = {
     ...note,
-    status,
-  };
+    status
+  }
 
-  await noteRepository.changeStatus(userId, noteId, status);
+  await noteRepository.changeStatus(userId, noteId, status)
 
-  return updated;
-};
+  return updated
+}

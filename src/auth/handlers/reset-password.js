@@ -1,20 +1,13 @@
-import { handleApiRequest } from "../../common/middlewares/base.middleware";
-import { parseRequest, validateRequest } from "../../common/utils/request";
-import { respond } from "../../common/utils/response";
-import { resetPasswordSchema } from "../request-schemas/auth.schema";
-import { getToken, resetPassword } from "../services/auth.service";
+import { http } from "../../common/middlewares/base.middleware"
+import { validateSchema } from '../../common/middlewares/validator.middleware'
+import { respond } from "../../common/utils/response"
+import { resetPasswordSchema } from "../request-schemas/auth.schema"
+import { getToken, resetPassword } from "../services/auth.service"
 
-export const handler = handleApiRequest(async (event) => {
-  const { body } = parseRequest(event);
+export const handler = http(async (event) => {
+  const accessToken = getToken(event)
 
-  const validation = await validateRequest(resetPasswordSchema, body);
+  await resetPassword(event.validated, accessToken)
 
-  if (validation.error) {
-    return respond(400, validation.error);
-  }
-
-  const accessToken = getToken(event);
-  await resetPassword(validation.validated, accessToken);
-
-  return respond(200, "Password reset successfully.");
-});
+  return respond(200, "Password reset successfully.")
+}).use(validateSchema(resetPasswordSchema))

@@ -1,23 +1,15 @@
-import { handleApiRequest } from "../../common/middlewares/base.middleware";
-import { parseRequest, validateRequest } from "../../common/utils/request";
-import { respond } from "../../common/utils/response";
-import { loginSchema } from "../request-schemas/auth.schema";
-import { login } from "../services/auth.service";
+import { http } from "../../common/middlewares/base.middleware"
+import { validateSchema } from "../../common/middlewares/validator.middleware"
+import { respond } from "../../common/utils/response"
+import { loginSchema } from "../request-schemas/auth.schema"
+import { login } from "../services/auth.service"
 
-export const handler = handleApiRequest(async (event) => {
-  const { body } = parseRequest(event);
-
-  const validation = await validateRequest(loginSchema, body);
-
-  if (validation.error) {
-    return respond(400, validation.error);
-  }
-
-  const response = await login(validation.validated);
+export const handler = http(async (event) => {
+  const response = await login(event.validated)
 
   if (response.error) {
-    return respond(400, response.error.message);
+    return respond(400, response.error.message)
   }
 
-  return respond(200, "Login completed.", response.data.session);
-});
+  return respond(200, "Login completed.", response.data.session)
+}).use(validateSchema(loginSchema))
